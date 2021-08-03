@@ -6,6 +6,7 @@ Created on Wed Jul 28 20:47:57 2021
 @author: hunglin
 """
 import os
+import sys
 import re
 import json
 from tqdm import tqdm
@@ -14,6 +15,7 @@ import youtube_dl
 from pathlib import Path
 from .convert import convert_webm2mp3
 from .validate import compute_md5, check_file_by_md5
+from .gui import run_gui
 
 ydl_opts = {
     'format': 'bestaudio/best',
@@ -26,8 +28,6 @@ ydl_opts = {
 }
 ydl = youtube_dl.YoutubeDL(ydl_opts)
 
-# url = "https://www.youtube.com/playlist?list=PLDBEBMxJMdKQR4hxCr0b2sybEOgp_f3T1"
-# os.chdir("/home/hunglin/Music")
 
 def get_playlist_info(url:str):
     pl_info = ydl.extract_info(url, download=False)
@@ -74,14 +74,7 @@ def get_argument():
     args = parser.parse_args()
     return args
         
-    
-def main():
-    args = get_argument()
-    url = args.playlist_url
-    out_dir = args.out_dir
-    # url = "https://www.youtube.com/playlist?list=PLDBEBMxJMdKQj_ZmISBdeJq0UyB1dZ5X2"
-    # out_dir = Path("/home/hunglin/Music")
-    
+def run_mach(url, out_dir):
     pl_info = get_playlist_info(url)
     pl_title = pl_info.get('title')
     pl_dir = out_dir / pl_title
@@ -107,21 +100,17 @@ def main():
     pbar.close()
                 
     info_f.write_text(json.dumps(info_d))
+    print("Finished.")
     return 0
-                
+
+def main():
+    if len(sys.argv) == 1:
+        run_gui()
+    else:
+        args = get_argument()
+        url = args.playlist_url
+        out_dir = args.out_dir
+        run_mach(url, out_dir)
+
 if __name__ == "__main__":
     main()
-    
-
-# out_dir = Path("/home/hunglin/Music")
-
-# url = "https://www.youtube.com/playlist?list=PLDBEBMxJMdKQR4hxCr0b2sybEOgp_f3T1"
-
-# playlist = Playlist(url)
-# playlist_title = playlist.title
-# videos = [x for x in playlist.video_urls]
-
-# for video in videos:
-#     yt = YouTube(video)
-#     # yt.streams.filter(type="audio").first().download(output_path=out_dir/)
-#     break
