@@ -3,3 +3,9 @@
 .spyproject/
 test/
 */*__pycache__
+Pipfile*
+build/
+dist/
+*spec
+.ipynb_checkpoints/
+lib/
