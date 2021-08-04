@@ -9,7 +9,8 @@ import os
 import sys
 import subprocess
 from pathlib import Path
-
+import wget
+import zipfile
 root_dir = Path(__file__).parent
 # install python packages
 subprocess.call(["pip", "install", "-r", root_dir/"requirements.txt"])
@@ -28,9 +29,12 @@ if sys.platform == "linux":
 elif sys.platform == "win32":
     link = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
     if not (os_dir/"ffmpeg/bin/ffmpeg").is_file():
-        os.system(f"wget -qc {link}")
-        os.system(f"unzip {Path(link).name} && rm {Path(link).name}")
+        zip_file = wget.download(url=link, out=str(os_dir/Path(link).name))
         
+        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+            zip_ref.extractall(os_dir)
+        os.remove(zip_file)
+                   
 for file in os_dir.iterdir():
     if file.is_dir() and file.name.startswith("ffmpeg"):
         file.rename(os_dir/"ffmpeg")
